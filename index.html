@@ -1,56 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>URL Shortener</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>URL Shortener by MS</title>
   <style>
     body {
-      background: #0f111a;
+      background: #0d1117;
       color: #fff;
-      font-family: sans-serif;
-      padding: 30px;
-      text-align: center;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
     }
-    input, button {
+
+    h1 {
+      margin-bottom: 20px;
+      color: #58a6ff;
+    }
+
+    input {
+      width: 100%;
+      max-width: 400px;
       padding: 10px;
-      border: 2px solid #00eaff;
+      border: none;
       border-radius: 8px;
-      margin: 10px;
-      background: #1b1f2f;
-      color: #00eaff;
+      margin-bottom: 10px;
+      font-size: 16px;
     }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: transparent;
+      color: #58a6ff;
+      border: 2px solid #58a6ff;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
     button:hover {
-      background: #00eaff22;
+      background-color: #58a6ff;
+      color: #0d1117;
     }
-    .result {
+
+    #result {
       margin-top: 20px;
+      font-size: 16px;
+      color: #79c0ff;
+      word-break: break-word;
     }
   </style>
 </head>
 <body>
   <h1>URL Shortener</h1>
-  <input type="text" id="url" placeholder="Enter long URL">
-  <button onclick="shorten()">Shorten</button>
-  <div class="result" id="output"></div>
+  <input type="text" id="urlInput" placeholder="Paste your long URL here..." />
+  <button onclick="shortenURL()">Shorten</button>
+  <div id="result"></div>
 
   <script>
-    function shorten() {
-      let url = document.getElementById('url').value;
-      let output = document.getElementById('output');
-      output.innerHTML = 'Processing...';
-      fetch(`https://api.shrtco.de/v2/shorten?url=${encodeURIComponent(url)}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.ok) {
-            output.innerHTML = `<a href="${data.result.full_short_link}" target="_blank">${data.result.full_short_link}</a>`;
-          } else {
-            output.textContent = 'Error: ' + data.error;
-          }
-        })
-        .catch(() => {
-          output.textContent = 'Something went wrong';
-        });
+    async function shortenURL() {
+      const longUrl = document.getElementById("urlInput").value;
+      const resultDiv = document.getElementById("result");
+
+      if (!longUrl) {
+        resultDiv.textContent = "Please enter a URL first.";
+        return;
+      }
+
+      resultDiv.textContent = "Shortening...";
+
+      try {
+        const response = await fetch(`https://api.shrtco.de/v2/shorten?url=${encodeURIComponent(longUrl)}`);
+        const data = await response.json();
+
+        if (data.ok) {
+          resultDiv.innerHTML = `Short URL: <a href="${data.result.full_short_link}" target="_blank">${data.result.full_short_link}</a>`;
+        } else {
+          resultDiv.textContent = "Error: " + data.error;
+        }
+      } catch (error) {
+        resultDiv.textContent = "Something went wrong. Please try again.";
+      }
     }
   </script>
 </body>
